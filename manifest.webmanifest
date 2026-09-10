@@ -1,0 +1,13 @@
+{
+  "name": "Carrie Coaching Journey",
+  "short_name": "Coaching",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f6fb",
+  "theme_color": "#f7f4ff",
+  "lang": "zh-Hant",
+  "icons": [
+    {"src":"icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
