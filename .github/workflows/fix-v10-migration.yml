@@ -1,0 +1,40 @@
+name: Fix v10 data migration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-v10-migration.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch v4 to v10 migration compatibility
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('coaching-v10.js')
+          s=p.read_text(encoding='utf-8')
+          old="function normalize(s){s=s&&typeof s==='object'?s:{};s.version=3;s.target=TOTAL_TARGET;s.paidTarget=PAID_TARGET;s.openingTotal=Math.max(0,num(s.openingTotal));s.openingPaid=Math.max(0,Math.min(s.openingTotal,num(s.openingPaid)));s.items=Array.isArray(s.items)?s.items:[];s.onboarded=Boolean(s.onboarded);return s}"
+          new="function normalize(s){s=s&&typeof s==='object'?s:{};let ot=s.openingTotal??s.startingHours??0,op=s.openingPaid??s.startingPaidHours??0,items=Array.isArray(s.items)?s.items:[];items=items.map(x=>{let origin=x.origin||(x.countMode==='included'?'past':'new'),count=x.countTowardsTotals!==undefined?x.countTowardsTotals:x.countMode==='included'?false:true,pc=x.paidClass||((x.payment==='免費／義務'||x.payment==='免費')?'free':'paid');return{...x,origin,countTowardsTotals:count,paidClass:pc}});return{...s,version:3,target:TOTAL_TARGET,paidTarget:PAID_TARGET,openingTotal:Math.max(0,num(ot)),openingPaid:Math.max(0,Math.min(Math.max(0,num(ot)),num(op))),items,onboarded:Boolean(s.onboarded||s.startingHours!==undefined)}}"
+          if old not in s:
+              raise SystemExit('normalize target not found')
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          node --check coaching-v10.js
+      - name: Commit fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add coaching-v10.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Preserve existing coaching progress in v10 migration"
+          git push
