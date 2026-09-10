@@ -1,5 +1,5 @@
-const C='coaching-v11';
-const A=['./','./index.html','./manifest.webmanifest','./icon.svg','./v4.css?v=1','./v4-core.js?v=1'];
+const C='coaching-v12';
+const A=['./','./index.html','./manifest.webmanifest','./icon.svg','./coaching-v10.css?v=10','./coaching-v10.js?v=10'];
 self.addEventListener('install',e=>{self.skipWaiting();e.waitUntil(caches.open(C).then(c=>c.addAll(A)))});
 self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==C).map(k=>caches.delete(k)))),self.clients.claim()])));
 self.addEventListener('fetch',e=>{
