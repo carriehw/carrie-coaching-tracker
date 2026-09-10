@@ -1,0 +1,82 @@
+/* Mobile UI/UX polish v13 — safe areas, onboarding spacing, line icon */
+html,body{min-height:100%;min-height:100dvh}
+body{overscroll-behavior-y:none}
+
+/* Keep the onboarding card clear of iPhone Safari chrome and safe areas. */
+.lock{
+  min-height:100dvh;
+  align-items:flex-start;
+  padding:calc(18px + env(safe-area-inset-top)) 18px calc(120px + env(safe-area-inset-bottom));
+  -webkit-overflow-scrolling:touch;
+}
+.lockCard{
+  margin:18px auto 0;
+  padding:28px 22px 30px;
+}
+.lockCard> .lockHint:last-child{
+  margin:16px 4px 0!important;
+  padding-top:14px;
+  border-top:1px solid #f0ecf5;
+  text-align:center;
+}
+.lockLabel{margin-top:15px}
+#onboardingFields .lockHint{margin:7px 2px 0}
+.pinWrap{margin-top:1px}
+#pinBtn{margin-top:14px!important}
+
+/* Replace emoji eye with a consistent iOS-style line icon. */
+.pinEye{
+  font-size:0!important;
+  color:#665d78;
+  background:#f3effd;
+  border:1px solid #ebe4fb;
+}
+.pinEye::before{
+  content:"";
+  width:21px;
+  height:13px;
+  border:1.8px solid currentColor;
+  border-radius:55% 55% 55% 55% / 70% 70% 70% 70%;
+  display:block;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+}
+.pinEye::after{
+  content:"";
+  width:5px;
+  height:5px;
+  border:1.8px solid currentColor;
+  border-radius:50%;
+  display:block;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  background:#fff;
+}
+.pinEye:active{transform:translateY(-50%) scale(.96);background:#ebe5fb}
+
+/* Slightly tighten page rhythm while keeping tap targets comfortable. */
+.screen>.card+ .card{margin-top:12px}
+#stats>.card,#settings>.card{margin-bottom:12px}
+.formSectionTitle.sectionGap{margin-top:22px}
+.actionsStack{gap:10px}
+
+@media(max-width:430px){
+  .lock{padding-left:14px;padding-right:14px;padding-bottom:calc(116px + env(safe-area-inset-bottom))}
+  .lockCard{margin-top:10px;border-radius:27px;padding:24px 18px 28px}
+  .lockMark{width:64px;height:64px;border-radius:21px;margin-bottom:12px}
+  .lockCard h2{font-size:22px;line-height:1.24}
+  .lockIntro{margin-top:8px;margin-bottom:16px}
+  .lockLabel{font-size:12px;margin-top:14px}
+  input,select{height:52px;min-height:52px}
+  .pinWrap .pin{font-size:21px}
+  .pinEye{width:40px;height:40px;right:6px}
+}
+
+@media(max-height:760px){
+  .lock{padding-top:calc(10px + env(safe-area-inset-top));padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+  .lockCard{margin-top:4px}
+}
