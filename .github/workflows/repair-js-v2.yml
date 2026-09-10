@@ -1,0 +1,82 @@
+name: Repair app JavaScript v2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/repair-js-v2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Repair invalid JavaScript and validate
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+
+          import_fn = r'''function importData(e){
+            let f=e.target.files[0];
+            if(!f)return;
+            let r=new FileReader();
+            r.onload=()=>{try{state=JSON.parse(r.result);save();toast('備份已匯入')}catch(err){toast('備份檔格式不正確')}};
+            r.readAsText(f)
+          }
+          function calendar('''
+          s,n=re.subn(r"function importData\(e\)\{.*?\}\s*function calendar\(",import_fn,s,count=1,flags=re.S)
+          if n!=1: raise SystemExit('Could not repair importData')
+
+          cal_fn = r'''function calendar(){
+            let a=state.items.find(x=>x.id===last);
+            if(!a)return;
+            let start=new Date(`${a.date}T${a.time}:00`);
+            let end=new Date(start.getTime()+a.expect*60000);
+            let f=d=>d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'T'+String(d.getHours()).padStart(2,'0')+String(d.getMinutes()).padStart(2,'0')+'00';
+            let lines=['BEGIN:VCALENDAR','VERSION:2.0','BEGIN:VEVENT',`UID:${a.id}@coach`,`DTSTART:${f(start)}`,`DTEND:${f(end)}`,`SUMMARY:Coaching｜${a.name}`,`LOCATION:${a.mode==='online'?(a.link||'線上 Coaching'):(a.place||'')}`,'END:VEVENT','END:VCALENDAR'];
+            let u=URL.createObjectURL(new Blob([lines.join(String.fromCharCode(13,10))],{type:'text/calendar'}));
+            let l=document.createElement('a');
+            l.href=u;l.download=`Coaching-${a.name}-${a.date}.ics`;l.click();URL.revokeObjectURL(u)
+          }
+          function hex('''
+          s,n=re.subn(r"function calendar\(\)\{.*?\}\s*function hex\(",cal_fn,s,count=1,flags=re.S)
+          if n!=1: raise SystemExit('Could not repair calendar')
+
+          p.write_text(s,encoding='utf-8')
+          PY
+
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          s=Path('index.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script>(.*?)</script>',s,flags=re.S)
+          Path('/tmp/app-inline.js').write_text('\n'.join(scripts),encoding='utf-8')
+          PY
+          node --check /tmp/app-inline.js
+
+      - name: Refresh cache
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('sw.js')
+          s=p.read_text(encoding='utf-8').replace("coaching-v4","coaching-v6").replace("coaching-v5","coaching-v6")
+          p.write_text(s,encoding='utf-8')
+          PY
+
+      - name: Commit repair
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sw.js
+          git commit -m "Fix broken app JavaScript and PIN interaction"
+          git push
