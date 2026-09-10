@@ -1,0 +1,52 @@
+name: Patch v4 historic record details
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/patch-v4-details.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add complete historic record fields
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('v4-core.js')
+          s=p.read_text(encoding='utf-8')
+
+          old='''<label>Coaching 日期 <span class="req">*</span></label><input id="bfDate" type="date" required><label>實際 Coaching 時長 <span class="req">*</span></label><select id="bfActual"><option value="30">30 分鐘</option><option value="45">45 分鐘</option><option value="60" selected>1 小時</option><option value="75">1 小時 15 分</option><option value="90">1.5 小時</option><option value="120">2 小時</option></select><label>本節 Coaching 主題</label><textarea id="bfTopic"></textarea><div class="formSectionTitle sectionGap"><span>02</span><div>Feedback 與反思</div></div>'''
+          new='''<label>Coaching 日期 <span class="req">*</span></label><input id="bfDate" type="date" required><label>開始時間（選填）</label><input id="bfTime" type="time"><label>實際 Coaching 時長 <span class="req">*</span></label><select id="bfActual"><option value="30">30 分鐘</option><option value="45">45 分鐘</option><option value="60" selected>1 小時</option><option value="75">1 小時 15 分</option><option value="90">1.5 小時</option><option value="120">2 小時</option></select><label>進行方式</label><select id="bfMode"><option value="online">線上</option><option value="offline">面對面</option><option value="unknown">未記錄</option></select><label>地點／會議連結（選填）</label><input id="bfPlace" placeholder="例如：Zoom／中環咖啡店"><label>本節 Coaching 主題</label><textarea id="bfTopic"></textarea><div class="formSectionTitle sectionGap"><span>02</span><div>錄音與同意</div></div><label>錄音／錄影</label><select id="bfRec"><option value="沒有">沒有</option><option value="錄音">有錄音</option><option value="錄影">有錄影</option></select><label>如有錄音／錄影，對方是否已同意？</label><select id="bfConsent"><option>不適用</option><option>是</option><option>否</option></select><div class="formSectionTitle sectionGap"><span>03</span><div>Feedback 與反思</div></div>'''
+          if old not in s:
+              raise SystemExit('Historic form anchor not found')
+          s=s.replace(old,new,1)
+          s=s.replace('<div class="formSectionTitle sectionGap"><span>03</span><div>付費／交換資料</div></div><label>付費／交換方式', '<div class="formSectionTitle sectionGap"><span>04</span><div>付費／交換資料</div></div><label>付費／交換方式',1)
+
+          pat=r"\$\('backfillForm'\)\.onsubmit=e=>\{.*?show\('finish'\)\};"
+          repl="""$('backfillForm').onsubmit=e=>{e.preventDefault();let a={id:Date.now().toString(),status:'done',countMode:'included',name:$('bfName').value.trim(),job:$('bfJob').value.trim(),phone:$('bfPhone').value.trim(),date:$('bfDate').value,time:$('bfTime').value,actual:+$('bfActual').value,mode:$('bfMode').value,place:$('bfPlace').value.trim(),topic:$('bfTopic').value.trim(),rec:$('bfRec').value,consent:$('bfConsent').value,feedback:$('bfFeedback').value.trim(),reflection:$('bfReflection').value.trim(),payment:$('bfPayment').value,paynote:$('bfPaynote').value.trim()};state.items.unshift(a);save();$('finishMsg').innerHTML=`已補錄 <b>${esc(a.name)}</b> 的 ${num(hrs(a.actual))} 小時 Coaching 資料。<br><b>總時數沒有增加</b>，避免重複計算。`;show('finish')};"""
+          s,n=re.subn(pat,lambda m:repl,s,count=1,flags=re.S)
+          if n!=1:
+              raise SystemExit('Historic submit handler not found')
+          p.write_text(s,encoding='utf-8')
+          PY
+          node --check v4-core.js
+          grep -q 'id="bfRec"' v4-core.js
+          grep -q 'id="bfMode"' v4-core.js
+          grep -q "countMode:'included'" v4-core.js
+      - name: Commit patch
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v4-core.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Complete historic Coaching backfill fields"
+          git push
