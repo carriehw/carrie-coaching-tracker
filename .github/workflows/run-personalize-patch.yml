@@ -17,6 +17,7 @@ jobs:
       - name: Apply patch
         shell: bash
         run: |
+          python .github/scripts/fix_personalize_patch.py
           python .github/scripts/personalize_patch.py
           python - <<'PY'
           from pathlib import Path
