@@ -1,0 +1,67 @@
+name: Fix name onboarding v12
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-name-onboarding-v12.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch name onboarding
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('coaching-v10.js')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace("const APP_BUILD='2026-09-11-v11';", "const APP_BUILD='2026-09-11-v12';")
+
+          new_prepare = r'''function progressFieldsVisible(show){['startTotal','startPaid'].forEach(id=>{let el=$(id),lab=document.querySelector(`label[for="${id}"]`),hint=el&&el.nextElementSibling;[el,lab,hint].forEach(n=>{if(n)n.style.display=show?'':'none'})})}function prepareLock(){let r=pinRec(),user=(localStorage.getItem(USER)||'').trim(),first=!r,needsName=!user;if(sessionStorage.getItem('coach_unlocked')==='1'&&!needsName){$('lock').classList.add('hidden');return}if(first){$('pinTitle').textContent='開始你的 ACC Coaching Journey';$('pinHelp').textContent='先輸入你的名稱和目前進度，再建立私人 PIN。';$('onboardingFields').classList.remove('hidden');progressFieldsVisible(true);$('userName').value=user;$('startTotal').value=state.openingTotal?pretty(state.openingTotal):'';$('startPaid').value=state.openingPaid?pretty(state.openingPaid):'';$('pinBtn').textContent='設定並開始'}else if(needsName){$('lock').classList.remove('hidden');$('pinTitle').textContent='先告訴我你的名稱';$('pinHelp').textContent='輸入你的名稱，再用現有私人 PIN 解鎖。';$('onboardingFields').classList.remove('hidden');progressFieldsVisible(false);$('userName').value='';$('pinBtn').textContent='儲存名稱並解鎖'}else{$('pinTitle').textContent=`歡迎回來，${user}`;$('pinHelp').textContent='輸入你的私人 PIN 解鎖。';$('onboardingFields').classList.add('hidden');progressFieldsVisible(true);$('pinBtn').textContent='解鎖'}}'''
+
+          s, n = re.subn(r"function prepareLock\(\)\{.*?\}async function handlePin\(\)", new_prepare + "async function handlePin()", s, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit(f'prepareLock patch failed: {n}')
+
+          old_unlock = "}else if(await hash(v,r.salt)===r.hash){sessionStorage.setItem('coach_unlocked','1');$('lock').classList.add('hidden');$('pin').value='';render()}else{$('pinError').textContent='PIN 不正確，請再試一次';$('pin').value=''}"
+          new_unlock = "}else if(await hash(v,r.salt)===r.hash){let savedUser=(localStorage.getItem(USER)||'').trim();if(!savedUser){let typed=($('userName')?.value||'').trim();if(!typed){$('pinError').textContent='請先輸入你的名稱';return}localStorage.setItem(USER,typed);savedUser=typed}sessionStorage.setItem('coach_unlocked','1');$('lock').classList.add('hidden');$('pin').value='';render()}else{$('pinError').textContent='PIN 不正確，請再試一次';$('pin').value=''}"
+          if old_unlock not in s:
+              raise SystemExit('unlock branch not found')
+          s = s.replace(old_unlock, new_unlock, 1)
+          p.write_text(s, encoding='utf-8')
+
+          idx = Path('index.html')
+          h = idx.read_text(encoding='utf-8').replace('coaching-v10.js?v=11','coaching-v10.js?v=12')
+          idx.write_text(h, encoding='utf-8')
+
+          sw = Path('sw.js')
+          w = sw.read_text(encoding='utf-8').replace("coaching-v13","coaching-v14").replace('coaching-v10.js?v=11','coaching-v10.js?v=12')
+          sw.write_text(w, encoding='utf-8')
+          PY
+          node --check coaching-v10.js
+          grep -q "先告訴我你的名稱" coaching-v10.js
+          grep -q "儲存名稱並解鎖" coaching-v10.js
+          grep -q "coaching-v10.js?v=12" index.html
+          grep -q "coaching-v14" sw.js
+      - name: Commit fix
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add coaching-v10.js index.html sw.js
+          git diff --cached --quiet && exit 0
+          git commit -m "Fix first-screen name onboarding"
+          for i in 1 2 3; do
+            git push && exit 0
+            git fetch origin main
+            git rebase origin/main
+          done
+          exit 1
