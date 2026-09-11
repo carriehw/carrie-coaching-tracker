@@ -1,0 +1,22 @@
+/* v24 — visible premium polish, preserving v22 UX */
+:root{--p:#7154e7;--p2:#9a72ef;--pink:#f5d9e9;--peach:#ffe4d8;--ink:#211b2d;--muted:#756e80;--line:#ebe5f1;--shadow:0 14px 36px rgba(78,55,123,.085)}
+body{background:radial-gradient(circle at 14% 2%,rgba(190,169,255,.24),transparent 29%),radial-gradient(circle at 91% 9%,rgba(255,185,212,.22),transparent 31%),linear-gradient(180deg,#fdfbff 0%,#f8f6fb 55%,#fbfafc 100%)}
+.mark,.lockMark{overflow:hidden;background:linear-gradient(145deg,#d8c9ff,#f4c9ea 58%,#ffd9ca);box-shadow:0 10px 26px rgba(105,72,184,.16)}
+.v24BrandIcon{width:100%;height:100%;display:block;object-fit:cover;border-radius:inherit}
+.hero{background:linear-gradient(135deg,#eee8ff 0%,#f8e5f1 55%,#ffe9df 100%);border-color:rgba(122,91,206,.10);box-shadow:0 18px 46px rgba(88,59,145,.10)}
+.goalCard,.quote,.item,.card,.metric,.support{border-color:rgba(110,82,154,.10);box-shadow:var(--shadow)}
+.primary{background:linear-gradient(118deg,#7054e7 0%,#9369ed 58%,#d77fc6 126%);box-shadow:0 11px 26px rgba(112,84,231,.24)}
+.btn,.ghost,.back,.seg button,.tab,.miniBtn{transition:transform .15s cubic-bezier(.2,.8,.2,1),box-shadow .18s ease,background .18s ease,border-color .18s ease,color .18s ease,opacity .18s ease}
+.btn:active,.ghost:active,.back:active,.seg button:active,.miniBtn:active{transform:scale(.975)}
+.primary:active{box-shadow:0 5px 14px rgba(112,84,231,.18)}
+input,select,textarea{transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease}input:focus,select:focus,textarea:focus{border-color:#9a80ee;box-shadow:0 0 0 4px rgba(124,88,228,.10)}
+.tabs{bottom:max(8px,env(safe-area-inset-bottom));width:min(496px,calc(100% - 20px));border:1px solid rgba(91,70,127,.11);border-radius:24px;padding:7px 8px;background:rgba(255,255,255,.90);box-shadow:0 14px 38px rgba(48,35,78,.14);-webkit-backdrop-filter:blur(22px);backdrop-filter:blur(22px)}
+.tab{border-radius:17px}.tab.active{background:linear-gradient(135deg,#eee9ff,#fff0f7);color:#654bd5;box-shadow:inset 0 0 0 1px rgba(116,87,232,.07),0 4px 12px rgba(95,70,155,.08);transform:translateY(-1px)}
+.tab.active:after{content:"";position:absolute;left:50%;bottom:4px;width:4px;height:4px;border-radius:50%;background:#7a5ae7;transform:translateX(-50%);opacity:.9}
+.miniProgress span,.progress span{transition:width .62s cubic-bezier(.2,.8,.2,1)}
+.screen.v24-enter{animation:v24Enter .24s cubic-bezier(.2,.8,.2,1) both}.v24-stagger{animation:v24Card .32s cubic-bezier(.2,.8,.2,1) both}.v24-success{animation:v24Success .56s cubic-bezier(.2,.9,.25,1.16) both}.v24-spark{position:absolute;pointer-events:none;font-size:15px;color:#8e6ae8;animation:v24Spark .68s ease-out both}
+@keyframes v24Enter{from{opacity:0;transform:translateY(8px) scale(.998)}to{opacity:1;transform:none}}@keyframes v24Card{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}@keyframes v24Success{0%{transform:scale(.985);opacity:.75}60%{transform:scale(1.012);opacity:1}100%{transform:scale(1)}}@keyframes v24Spark{0%{opacity:0;transform:translateY(5px) scale(.65)}35%{opacity:1}100%{opacity:0;transform:translateY(-17px) scale(1.08)}}
+.v24LangRow{display:flex;align-items:center;justify-content:space-between;gap:14px}.v24LangSeg{display:flex;padding:3px;border-radius:13px;background:#f4f0fa;border:1px solid #e9e2f2}.v24LangSeg button{border:0;background:transparent;color:#746d7c;border-radius:10px;min-width:58px;padding:8px 10px;font-weight:800}.v24LangSeg button.on{background:#fff;color:#654bd2;box-shadow:0 3px 10px rgba(72,53,112,.09)}.v24LockLang{display:flex;justify-content:center;margin:-2px 0 14px}
+.formSectionTitle{background:linear-gradient(120deg,#f8f5ff,#fff8fb);border-color:#eee6fb}.formSectionTitle span{background:linear-gradient(135deg,#e8dfff,#f3e6ff);color:#654bcd}
+.lock{background:radial-gradient(circle at 20% 8%,rgba(196,171,255,.34),transparent 30%),radial-gradient(circle at 90% 25%,rgba(255,191,217,.30),transparent 33%),linear-gradient(160deg,#f8f5ff,#fff0f6 58%,#fff5ef)}.lockCard{box-shadow:0 28px 75px rgba(75,50,124,.14)}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.001ms!important}}
