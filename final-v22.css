@@ -1,0 +1,8 @@
+/* Final v22 — keep the last additions simple and unobtrusive */
+.v22Actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.v22CancelBtn{border-color:#edd6dc!important;color:#9a4f60!important;background:#fff8fa!important}
+.v22DangerBtn{margin-top:10px;background:#fff8fa!important;border:1.5px solid #efd8df!important;color:#9a4f60!important;box-shadow:none!important}
+.v22BackupStatus{margin:12px 0 2px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,#faf7ff,#fff8fb);border:1px solid #eee7f6;display:flex;flex-direction:column;gap:3px}
+.v22BackupStatus b{font-size:14px;color:#4e465b}
+.v22BackupStatus span{font-size:12px;line-height:1.5;color:#7b7484}
+@media(max-width:420px){.v22Actions .miniBtn{flex:1 1 120px}.v22DangerBtn{min-height:48px}}
