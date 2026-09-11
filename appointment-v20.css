@@ -1,0 +1,11 @@
+/* Coaching Journey v20 — appointment preview + edit affordance */
+#v20EditSaved{margin:10px 0 14px}
+#saved .messageText{min-height:120px;max-height:300px;overflow:auto;white-space:pre-wrap;color:#4d4755}
+#saved .messagePreview.emptyPreview .messageText{min-height:auto;color:#8b8492}
+.v20EditBanner{margin-bottom:14px;background:linear-gradient(135deg,#f5f0ff,#fff7fb);border:1px solid #e8e0f4;border-radius:18px;padding:12px 14px;font-size:12px;line-height:1.5;color:#5c5366}
+.v20UpcomingActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.v20UpcomingActions .miniBtn{width:100%}
+#homeList .v20HomeEdit{margin-top:9px;width:100%;min-height:38px;border:1.5px solid #dfd9e9;background:#fff;color:#5b5365;border-radius:12px;font-size:11px;font-weight:850}
+#appointment.v20-editing .steps{display:none}
+#appointment.v20-editing .support{margin-top:4px}
+@media(max-width:380px){.v20UpcomingActions{grid-template-columns:1fr}}
