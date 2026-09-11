@@ -1,0 +1,77 @@
+name: UI UX polish v14
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/ui-ux-polish-v14.yml'
+permissions:
+  contents: write
+jobs:
+  polish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Polish mobile UI and information architecture
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          js_path = Path('coaching-v10.js')
+          css_path = Path('coaching-v10.css')
+          index_path = Path('index.html')
+          sw_path = Path('sw.js')
+
+          js = js_path.read_text()
+          css = css_path.read_text()
+          index = index_path.read_text()
+          sw = sw_path.read_text()
+
+          # Build marker
+          js = js.replace("const APP_BUILD='2026-09-11-v12';", "const APP_BUILD='2026-09-11-v14';")
+
+          # Make Coachee metric clearer: it includes any recorded person, not only completed sessions.
+          js = js.replace('Coachee<br>人數', '已記錄<br>Coachee')
+          js = js.replace('Coachee 人數', '已記錄 Coachee')
+
+          # Move backup tools out of analytics and into Settings, where users expect data management.
+          backup = '<div class="card"><h3 style="font-size:16px;margin-bottom:9px">資料備份</h3><p class="small">資料只儲存在這部裝置。建議定期匯出備份，避免清除瀏覽器資料後遺失紀錄。</p><div class="actionsStack" style="margin-top:12px"><button class="btn secondary" onclick="exportData()">匯出備份</button><button class="btn secondary" onclick="document.getElementById(\'importer\').click()">匯入備份</button></div><input id="importer" class="hidden" type="file" accept=".json" onchange="importData(event)"></div>'
+          if backup in js:
+              js = js.replace(backup, '', 1)
+              settings_anchor = '<button class="btn primary" style="margin-top:15px" onclick="saveSettings()">儲存設定</button></div><div class="support">🔐 你的 Coaching 資料只會儲存在這部裝置，不會公開上傳。</div>'
+              settings_repl = '<button class="btn primary" style="margin-top:15px" onclick="saveSettings()">儲存設定</button></div>' + backup + '<div class="support">🔐 你的 Coaching 資料只會儲存在這部裝置，不會公開上傳。</div>'
+              if settings_anchor not in js:
+                  raise SystemExit('settings anchor not found')
+              js = js.replace(settings_anchor, settings_repl, 1)
+          else:
+              print('Backup card already moved or source snippet changed')
+
+          # Improve visibility of the circular progress on pale hero backgrounds.
+          old_ring = '.ring{--pct:0%;width:104px;height:104px;flex:0 0 104px;border-radius:50%;background:conic-gradient(var(--p) var(--pct),#ffffffa6 0);display:grid;place-items:center;position:relative}'
+          new_ring = '.ring{--pct:0%;width:104px;height:104px;flex:0 0 104px;border-radius:50%;background:conic-gradient(from -90deg,var(--p) 0 var(--pct),rgba(255,255,255,.58) var(--pct) 100%);display:grid;place-items:center;position:relative;box-shadow:inset 0 0 0 1px rgba(103,81,207,.10),0 7px 20px rgba(80,60,150,.08)}'
+          if old_ring in css:
+              css = css.replace(old_ring, new_ring, 1)
+
+          css += '\n/* v14: shared-screen polish */\n#settings .card + .card{margin-top:14px}\n#stats .card{margin-bottom:14px}\n#records .seg.three{position:sticky;top:calc(8px + env(safe-area-inset-top));z-index:10;background:rgba(247,246,251,.94);backdrop-filter:blur(12px);padding:4px;border-radius:18px}\n@media(max-width:420px){#records .seg.three button{font-size:13px}.lockCard{margin-top:max(12px,env(safe-area-inset-top));margin-bottom:max(26px,env(safe-area-inset-bottom))}}\n'
+
+          # Bust asset caches.
+          index = index.replace('coaching-v10.css?v=13','coaching-v10.css?v=14').replace('coaching-v10.css?v=11','coaching-v10.css?v=14')
+          index = index.replace('coaching-v10.js?v=13','coaching-v10.js?v=14').replace('coaching-v10.js?v=12','coaching-v10.js?v=14')
+          sw = sw.replace("const C='coaching-v14';", "const C='coaching-v15';")
+          sw = sw.replace("./coaching-v10.css?v=11", "./coaching-v10.css?v=14")
+          sw = sw.replace("./coaching-v10.js?v=12", "./coaching-v10.js?v=14")
+
+          js_path.write_text(js)
+          css_path.write_text(css)
+          index_path.write_text(index)
+          sw_path.write_text(sw)
+          PY
+          node --check coaching-v10.js
+          grep -q "coaching-v10.js?v=14" index.html
+          grep -q "coaching-v10.css?v=14" index.html
+      - name: Commit polish
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add coaching-v10.js coaching-v10.css index.html sw.js
+          git diff --cached --quiet || git commit -m 'Polish full app UI UX v14'
+          git push
