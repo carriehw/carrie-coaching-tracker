@@ -1,0 +1,183 @@
+/* Coaching Journey v19 — iPhone Safari form-control alignment + mobile QA */
+
+/* Keep all form controls on one visual system */
+input,
+select,
+textarea{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif;
+  font-size:16px;
+  color:var(--ink);
+}
+
+input,
+select{
+  width:100%;
+  height:56px;
+  min-height:56px;
+  border-radius:17px;
+  padding-left:15px;
+  padding-right:15px;
+  line-height:1.2;
+  vertical-align:middle;
+}
+
+/* Normal text/number/tel inputs: true vertical centring */
+input:not([type="date"]):not([type="time"]):not([type="file"]){
+  padding-top:0;
+  padding-bottom:0;
+}
+
+/* iOS Safari renders date/time text inside its own shadow DOM.
+   These rules align the internal value vertically with normal inputs. */
+input[type="date"],
+input[type="time"]{
+  -webkit-appearance:none;
+  appearance:none;
+  height:56px;
+  min-height:56px;
+  padding:0 15px;
+  line-height:normal;
+  text-align:left;
+  background:#fff;
+}
+
+input[type="date"]::-webkit-date-and-time-value,
+input[type="time"]::-webkit-date-and-time-value{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  width:100%;
+  height:54px;
+  min-height:54px;
+  margin:0;
+  padding:0;
+  line-height:1.2;
+  text-align:left;
+}
+
+input[type="date"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit{
+  display:flex;
+  align-items:center;
+  height:100%;
+  padding:0;
+  margin:0;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input[type="time"]::-webkit-datetime-edit-fields-wrapper{
+  display:flex;
+  align-items:center;
+  height:100%;
+  padding:0;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator{
+  align-self:center;
+  margin:0 0 0 auto;
+  padding:6px 0 6px 8px;
+}
+
+/* Native select stays familiar on iPhone while matching input height/baseline */
+select{
+  min-height:56px;
+  height:56px;
+  padding-top:0;
+  padding-bottom:0;
+  padding-left:15px;
+  padding-right:38px;
+  line-height:normal;
+  background-color:#fff;
+}
+
+textarea{
+  min-height:112px;
+  border-radius:17px;
+  padding:14px 15px;
+  line-height:1.55;
+}
+
+/* Consistent focus treatment across every editable screen */
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:#8f7bea;
+  box-shadow:0 0 0 4px rgba(114,91,226,.10);
+}
+
+/* Labels and form rhythm */
+.card label,
+#v15EditForm label{
+  margin-top:17px;
+  margin-bottom:8px;
+}
+
+.formSectionTitle{
+  margin-bottom:14px;
+}
+.formSectionTitle.sectionGap{
+  margin-top:26px;
+}
+
+/* Segmented controls should visually equal the height of inputs */
+.seg button{
+  min-height:52px;
+  line-height:1.2;
+}
+
+/* Header / safe-area polish */
+.app{
+  padding-top:calc(22px + env(safe-area-inset-top));
+  padding-bottom:calc(94px + env(safe-area-inset-bottom));
+}
+
+.head{
+  min-height:44px;
+  align-items:center;
+}
+.head .back{
+  display:grid;
+  place-items:center;
+  line-height:1;
+}
+
+/* Prevent the bottom nav from visually colliding with long forms */
+.screen form.card:last-child,
+#v15Edit .card{
+  margin-bottom:12px;
+}
+
+/* iPhone-specific small-screen tuning */
+@media(max-width:420px){
+  input,
+  select,
+  input[type="date"],
+  input[type="time"]{
+    height:56px;
+    min-height:56px;
+  }
+  input[type="date"]::-webkit-date-and-time-value,
+  input[type="time"]::-webkit-date-and-time-value{
+    height:54px;
+    min-height:54px;
+  }
+  .card{
+    padding-left:16px;
+    padding-right:16px;
+  }
+  .formSectionTitle{
+    padding:10px 11px;
+  }
+}
+
+@media(max-width:360px){
+  input,
+  select,
+  textarea{
+    font-size:16px;
+  }
+  .seg.two{
+    gap:8px;
+  }
+}
