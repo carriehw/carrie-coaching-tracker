@@ -1,0 +1,20 @@
+/* v27 — compact Home upcoming cards + bottom-nav-safe content spacing */
+.app{padding-bottom:calc(138px + env(safe-area-inset-bottom))}
+#home .section{padding-bottom:8px}
+#homeList.homeCompactList{gap:9px}
+.v27HomeItem{padding:14px 15px;border-radius:20px}
+.v27HomeTop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.v27HomeName{min-width:0}
+.v27HomeName h4{font-size:17px;line-height:1.25;margin:0}
+.v27HomeMeta{margin-top:5px;color:var(--muted);font-size:12px;line-height:1.48}
+.v27HomeMeta .v27Job{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.v27HomeItem .badge{font-size:9px;padding:5px 7px;line-height:1.1;box-shadow:none}
+.v27HomeActionRow{display:flex;justify-content:flex-end;margin-top:10px}
+.v27HomeAction{min-height:44px;border-radius:13px;padding:0 14px;border:1.5px solid #ded7ee;background:#fff;color:#5c536b;font-size:12px;font-weight:850;box-shadow:none;transition:transform .14s cubic-bezier(.2,.8,.2,1),background .16s ease,border-color .16s ease,color .16s ease,box-shadow .16s ease}
+.v27HomeAction:active{transform:scale(.975)}
+.v27HomeAction.isDue{border-color:transparent;color:#fff;background:linear-gradient(118deg,#7054e7 0%,#9369ed 58%,#d77fc6 126%);box-shadow:0 7px 18px rgba(112,84,231,.18)}
+.v27MoreRow{display:flex;justify-content:center;margin-top:9px}
+.v27MoreBtn{min-height:40px;border:0;border-radius:999px;padding:8px 13px;background:#f3effd;color:#6651cf;font-size:11px;font-weight:850;transition:transform .14s cubic-bezier(.2,.8,.2,1),background .16s ease}
+.v27MoreBtn:active{transform:scale(.975);background:#ebe5fb}
+@media(max-width:380px){.v27HomeItem{padding:13px}.v27HomeName h4{font-size:16px}.v27HomeMeta{font-size:11px}.v27HomeAction{width:100%}.v27HomeActionRow{justify-content:stretch}}
+@media(prefers-reduced-motion:reduce){.v27HomeAction,.v27MoreBtn{transition:none!important}}
