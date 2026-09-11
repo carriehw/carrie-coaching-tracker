@@ -1,0 +1,9 @@
+/* v28 — online appointment platform/contact UX */
+.v28OnlineBlock{margin-top:14px;padding:14px;border:1px solid rgba(111,87,223,.12);border-radius:18px;background:linear-gradient(135deg,#fbf9ff,#fffafd)}
+.v28OnlineBlock label:first-child{margin-top:0}
+.v28OnlineHint{margin-top:7px;color:#756e80;font-size:11px;line-height:1.5}
+.v28OnlineSub{margin-top:12px}
+.v28OnlineSub.hidden{display:none!important}
+#onlineMethodV28{background:#fff}
+#onlineContactV28{background:#fff}
+@media(max-width:380px){.v28OnlineBlock{padding:12px;border-radius:16px}}
