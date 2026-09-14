@@ -4,7 +4,7 @@
 
 ## Product
 - Live: https://carriehw.github.io/carrie-coaching-tracker/
-- Current generation: **v28** (bilingual + v26 booking copy + compact Home + flexible online appointment methods)
+- Current generation: **v29** (bilingual + compact Home + flexible online methods + stable appointment context/calendar access)
 - Mobile-first PWA; priority: iPhone Safari / Add to Home Screen.
 - Static GitHub Pages app. Runtime user data stays in each browser/device; no cloud account or sync.
 
@@ -49,6 +49,16 @@ Rules:
 - Existing pre-v28 online appointments stay valid. Existing `link` data is preserved and method may be inferred when editing.
 - In-person appointments continue using `place`.
 
+### Appointment-context invariant (v29)
+Saved-screen summary, booking-message preview, copy/share actions and Apple Calendar must always refer to the **same exact appointment currently being viewed**. Never fall back to a different globally-latest appointment when the saved screen is displaying an older appointment.
+
+Implementation uses `coaching_current_appt_v1` plus saved-screen matching as a defensive fallback.
+
+Calendar access:
+- Apple Calendar remains available immediately after save.
+- Upcoming records in **Records** also expose `加入日曆 / Add to Calendar`, so a user can add an appointment later without editing and re-saving it.
+- Calendar export must use the selected appointment ID, not whichever appointment was created most recently.
+
 ### Completed Coaching
 Keep: actual duration, topic, paid/exchange vs free, payment/exchange method, optional note, recording/video/none, consent, Coachee feedback, personal reflection. Editing a completed NEW record recalculates totals.
 
@@ -56,7 +66,7 @@ Keep: actual duration, topic, paid/exchange vs free, payment/exchange method, op
 Keep: name, phone, role, date, optional start time, actual duration, format, location/link, topic, historical hour category, payment/exchange method, recording, consent, feedback, reflection. Never count it again toward totals.
 
 ### Records
-Tabs: Upcoming / Completed / Past Records. Support detail, edit, delete; Upcoming also supports edit/cancel.
+Tabs: Upcoming / Completed / Past Records. Support detail, edit, delete; Upcoming also supports edit/cancel and Add to Calendar.
 
 ### Progress
 Keep: total/100, paid-exchange/75, free hours, completed sessions, recorded Coachees, app-added hours, past-record count, reconstruction progress, Coachees/8, recent detailed hours/25. Do not claim full ACC eligibility from opening lump-sum hours alone.
@@ -75,14 +85,14 @@ Base structure:
 - Location/link or contact details only when relevant
 - Warm Coaching explanation + confidentiality/safe-space reminder
 
-v28 online-message rules:
+Online-message rules:
 - Link-based platform: `線上 · [platform]` + `地點/鏈結`.
 - WhatsApp Video Call: `線上 · WhatsApp Video Call`; use `onlineContact`, otherwise existing phone; do not show a blank URL line.
 - FaceTime: `線上 · FaceTime`; optional contact line.
 - Other: show optional contact detail only when provided.
 - Legacy online appointment without `onlineMethod` continues using the old link behavior.
 
-## Home information architecture (v27)
+## Home information architecture
 Home is an overview, not the full Records list.
 - Show only the next **2** upcoming appointments.
 - If more exist, show a subtle `X more appointments / 另有 X 個預約` shortcut to Records.
@@ -104,19 +114,19 @@ Motion: page fade/rise, button press scale ~0.98, light card stagger, smooth pro
 - English strings must not clip.
 
 ## Data / security
-Keys: DB `coaching_tracker_v3`; PIN `coaching_pin_v1`; user `coaching_user_name_v1`; language `coaching_lang_v1`; last backup `coaching_last_backup_v1`; session unlock `coach_unlocked`.
+Keys: DB `coaching_tracker_v3`; PIN `coaching_pin_v1`; user `coaching_user_name_v1`; language `coaching_lang_v1`; last backup `coaching_last_backup_v1`; current appointment `coaching_current_appt_v1`; session unlock `coach_unlocked`.
 
 LocalStorage implications: devices/browsers are independent; classmates do not see each other’s records; clearing site data can erase records; avoid private mode; JSON export/import is migration/backup. PIN is a UI lock, not encryption.
 
-## Active source layers (v28)
+## Active source layers (v29)
 CSS: `coaching-v10.css`, `polish-v13.css`, `coaching-v15.css`, `form-controls-v19.css`, `appointment-v20.css`, `final-v22.css`, `visual-v24.css`, `home-v27.css`, `online-v28.css`.
 
-JS: `coaching-v10.js`, `coaching-v15-addon.js`, `appointment-v20.js`, `scroll-reset-v21.js`, `final-v22.js`, `visual-v24.js`, `i18n-v25.js`, `booking-template-v26.js`, `home-v27.js`, `online-v28.js`.
+JS: `coaching-v10.js`, `coaching-v15-addon.js`, `appointment-v20.js`, `scroll-reset-v21.js`, `final-v22.js`, `visual-v24.js`, `i18n-v25.js`, `booking-template-v26.js`, `home-v27.js`, `online-v28.js`, `appointment-context-v29.js`.
 
 Older files may still provide active logic; do not delete casually.
 
 ## Release checklist
-Verify: unlock/Home scroll; add/edit/cancel appointment; online platform fields for all six methods; old online appointments still edit correctly; booking preview/share reflects platform/contact; Apple Calendar; NEW completion totals; paid/free logic; past records never affect totals; completed edit/delete; stats; backup + last date; PIN; zh-Hant/EN dynamic UI; no translated user content; no nav overlap; Safari date/time; icon; smooth/reduced motion.
+Verify: unlock/Home scroll; add/edit/cancel appointment; online platform fields for all six methods; old online appointments still edit correctly; saved summary/booking preview/share all stay bound to the same appointment even when newer appointments exist; Apple Calendar from saved screen and from any Upcoming record; NEW completion totals; paid/free logic; past records never affect totals; completed edit/delete; stats; backup + last date; PIN; zh-Hant/EN dynamic UI; no translated user content; no nav overlap; Safari date/time; icon; smooth/reduced motion.
 
 ## Scope guardrail
 Do not add cloud accounts, auto-sync, CRM features, complex filters, social features, notifications, heavy analytics, or AI coaching advice unless explicitly approved. Future cloud sync can use Supabase; Vercel may be considered when backend/preview needs justify it.
