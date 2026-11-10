@@ -1,0 +1,5 @@
+/* v30: keep the navigation at the physical bottom of the visible iPhone viewport. */
+html,body{min-height:100%;overflow-x:clip}
+.tabs{position:fixed!important;top:auto!important;bottom:calc(env(safe-area-inset-bottom,0px) + 8px)!important;left:50%!important;right:auto!important;transform:translate3d(-50%,0,0)!important;width:min(496px,calc(100% - 20px))!important;max-width:calc(100vw - 20px);z-index:90!important;margin:0!important;will-change:auto}
+.app{padding-bottom:calc(170px + env(safe-area-inset-bottom,0px))!important}
+@media(max-width:380px){.tabs{bottom:calc(env(safe-area-inset-bottom,0px) + 6px)!important}}
